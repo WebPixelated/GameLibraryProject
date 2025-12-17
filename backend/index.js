@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const gameRoutes = require("./routes/gameRoutes"); // убрали .js
+const gameRoutes = require("./routes/gameRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json()); // Allows to read JSON body
 
 // Routes
 app.use("/api/games", gameRoutes);
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
   res.send("Game Library API is running...");
