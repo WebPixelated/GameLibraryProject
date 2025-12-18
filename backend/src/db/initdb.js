@@ -3,7 +3,7 @@ const path = require("path");
 
 const pool = require("../config/db");
 
-async function dropDatabase() {
+async function initDatabase() {
   try {
     const sql = fs.readFileSync(path.join(__dirname, "sql/init.sql"), "utf-8");
 
@@ -17,4 +17,4 @@ async function dropDatabase() {
   }
 }
 
-dropDatabase();
+initDatabase();
