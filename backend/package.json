@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "db:init": "node db/initdb.js",
-    "db:seed": "node db/populatedb.js",
-    "db:reset": "node db/dropdb.js && node db/initdb.js && node db/populatedb.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "db:init": "node src/db/initdb.js",
+    "db:seed": "node src/db/populatedb.js",
+    "db:reset": "node src/db/dropdb.js && node src/db/initdb.js && node src/db/populatedb.js"
   },
   "keywords": [],
   "author": "",
