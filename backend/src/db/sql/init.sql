@@ -29,6 +29,7 @@ CREATE TABLE games (
     title           VARCHAR(500) NOT NULL,
     image_url       VARCHAR(1000),
     genres          VARCHAR(500),                -- "Action, RPG, Adventure"
+    tags            VARCHAR(1000),
     released        DATE,
     metacritic      SMALLINT,
     steam_app_id    INTEGER UNIQUE,              -- For Steam linking
@@ -118,7 +119,8 @@ RETURNS TRIGGER AS $$
 BEGIN
     NEW.search_vector = 
         setweight(to_tsvector('english', COALESCE(NEW.title, '')), 'A') ||
-        setweight(to_tsvector('english', COALESCE(NEW.genres, '')), 'B');
+        setweight(to_tsvector('english', COALESCE(NEW.genres, '')), 'B') ||
+        setweight(to_tsvector('english', COALESCE(NEW.tags, '')), 'C');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

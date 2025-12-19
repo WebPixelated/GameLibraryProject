@@ -2,6 +2,7 @@ require("./config/env");
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
+const libraryRoutes = require("./routes/libraryRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -13,9 +14,14 @@ app.use(express.json()); // Allows to read JSON body
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/library", libraryRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Game Library API is running...");
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+  });
 });
 
 app.use(errorHandler);
