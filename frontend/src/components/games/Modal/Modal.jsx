@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { Button } from "../../common/Button/Button";
 import styles from "./Modal.module.css";
+import Button from "./../../common/Button/Button";
 
 function Modal({ isOpen, onClose, title, children }) {
   // Close on Escape key

@@ -4,7 +4,7 @@
   text-transform: uppercase;
   letter-spacing: 0.025em;
   border-radius: var(--radius-sm);
-  background-color: var(--color-bg-secondary);
+  background-color: var(--status-bg);
 }
 
 /* Sizes */
