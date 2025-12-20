@@ -1,0 +1,98 @@
+:root {
+  /* =========================
+     Base colors (Light theme)
+     ========================= */
+
+  /* Backgrounds */
+  --color-bg-primary: #f6f2fa; /* main bg */
+  --color-bg-secondary: #ffffff; /* cards, panels */
+
+  /* Brand */
+  --color-primary: #5b3fa6; /* primary buttons, links */
+  --color-primary-light: #c8a6e6;
+  --color-primary-dark: #4a318c;
+
+  /* Text */
+  --color-text-primary: #2b2b2f;
+  --color-text-secondary: rgba(43, 43, 47, 0.65);
+  --color-text-muted: rgba(43, 43, 47, 0.45);
+  --color-text-inverse: #ffffff;
+
+  /* Accent / Highlight */
+  --color-accent: #00e5ff;
+  --color-error: #ff4d4f;
+
+  /* Borders & dividers */
+  --color-border: rgba(43, 43, 47, 0.12);
+  --color-border-hover: rgba(43, 43, 47, 0.24);
+
+  /* States */
+  --color-hover-overlay: rgba(91, 63, 166, 0.08);
+  --color-active-overlay: rgba(91, 63, 166, 0.16);
+
+  /* =========================
+     Game statuses
+     ========================= */
+
+  --status-wishlist: #00e5ff;
+  --status-owned: #7cff6b;
+  --status-playing: #ffd400;
+  --status-completed: #8b5cf6;
+  --status-dropped: #ff4d4f;
+
+  /* =========================
+     CSS VARIABLES
+     ========================= */
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* Border radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.3);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+}
+
+[data-theme="dark"] {
+  /* =========================
+     Base colors (Dark theme)
+     ========================= */
+
+  /* Backgrounds */
+  --color-bg-primary: #1e1236; /* main bg */
+  --color-bg-secondary: #25153f; /* cards, panels */
+
+  /* Brand */
+  --color-primary: #5b3fa6;
+  --color-primary-light: #8660af;
+  --color-primary-dark: #3e2a73;
+
+  /* Text */
+  --color-text-primary: #f6f2fa;
+  --color-text-secondary: rgba(246, 242, 250, 0.7);
+  --color-text-muted: rgba(246, 242, 250, 0.5);
+  --color-text-inverse: #1e1236;
+
+  /* Accent / Highlight */
+  --color-accent: #00e5ff;
+
+  /* Borders & dividers */
+  --color-border: rgba(246, 242, 250, 0.12);
+  --color-border-hover: rgba(246, 242, 250, 0.24);
+
+  /* States */
+  --color-hover-overlay: rgba(200, 166, 230, 0.08);
+  --color-active-overlay: rgba(200, 166, 230, 0.16);
+}
