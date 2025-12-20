@@ -16,7 +16,7 @@ function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
-          GameTracker
+          GameLibrary
         </Link>
 
         <nav className={styles.nav}>
