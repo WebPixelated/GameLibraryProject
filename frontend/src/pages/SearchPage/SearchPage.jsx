@@ -8,9 +8,21 @@ import Loader from "../../components/common/Loader/Loader";
 import Input from "./../../components/common/Input/Input";
 import GameCard from "./../../components/games/GameCard/GameCard";
 
+const SOURCE_OPTIONS = [
+  {
+    value: "rawg",
+    label: "RAWG",
+  },
+  {
+    value: "local",
+    label: "Local",
+  },
+];
+
 function SearchPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [source, setSource] = useState("rawg");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,8 +44,17 @@ function SearchPage() {
     setLoading(true);
 
     try {
-      const res = await libraryAPI.search(query, "rawg");
-      setResults(res.data.rawg || []);
+      const res = await libraryAPI.search(query, source);
+
+      let resultsArray = [];
+
+      if (source === "rawg") {
+        resultsArray = res.data.rawg || [];
+      } else if (source === "local") {
+        resultsArray = res.data.local || [];
+      }
+
+      setResults(resultsArray);
     } catch (err) {
       setError(err.response?.data?.error || "Search failed");
     } finally {
@@ -93,6 +114,17 @@ function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
+        <select
+          value={source}
+          onChange={(e) => setSource(e.target.value)}
+          className={styles.select}
+        >
+          {SOURCE_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
         <Button type="submit" loading={loading}>
           Search
         </Button>
@@ -112,6 +144,7 @@ function SearchPage() {
               <GameCard
                 key={game.rawg_id}
                 game={game}
+                source_rawg={source === "rawg" ? true : false}
                 actions={
                   <Button
                     size="sm"
@@ -126,9 +159,7 @@ function SearchPage() {
           </div>
         </div>
       ) : query && !loading ? (
-        <p className={styles.noResults}>
-          No games found. Try a different search.
-        </p>
+        <p className={styles.noResults}>No games found yet.</p>
       ) : null}
 
       {/* Add Game Modal */}
