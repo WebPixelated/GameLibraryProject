@@ -1,0 +1,40 @@
+.badge {
+  display: inline-block;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  border-radius: var(--radius-sm);
+  background-color: var(--status-bg);
+}
+
+/* Sizes */
+.sm {
+  padding: 0.125rem 0.375rem;
+  font-size: 0.625rem;
+}
+
+.md {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+/* Status colors */
+.wishlist {
+  color: var(--status-wishlist);
+}
+
+.owned {
+  color: var(--status-owned);
+}
+
+.playing {
+  color: var(--status-playing);
+}
+
+.completed {
+  color: var(--status-completed);
+}
+
+.dropped {
+  color: var(--status-dropped);
+}
