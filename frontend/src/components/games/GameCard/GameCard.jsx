@@ -1,7 +1,13 @@
 import StatusBadge from "../StatusBadge/StatusBadge";
 import styles from "./GameCard.module.css";
 
-function GameCard({ game, showStatus = false, actions, onClick }) {
+function GameCard({
+  game,
+  showStatus = false,
+  actions,
+  onClick,
+  source_rawg = false,
+}) {
   const imageUrl =
     game.image_url ||
     "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png";
@@ -48,7 +54,9 @@ function GameCard({ game, showStatus = false, actions, onClick }) {
         {(game.hours_played > 0 || game.rating) && (
           <div className={styles.stats}>
             {game.hours_played > 0 && <span>🕐 {game.hours_played}h</span>}
-            {game.rating && <span>⭐ {game.rating}/10</span>}
+            {game.rating && (
+              <span>⭐ {source_rawg ? game.rating * 2 : game.rating}/10</span>
+            )}
           </div>
         )}
 
