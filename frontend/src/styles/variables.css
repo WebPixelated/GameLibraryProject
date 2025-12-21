@@ -71,16 +71,16 @@
      ========================= */
 
   /* Backgrounds */
-  --color-bg-primary: #1e1236; /* main bg */
-  --color-bg-secondary: #25153f; /* cards, panels */
+  --color-bg-primary: #170c2b; /* main bg */
+  --color-bg-secondary: #22133f; /* cards, panels */
 
   /* Brand */
-  --color-primary: #5b3fa6;
-  --color-primary-light: #8660af;
-  --color-primary-dark: #3e2a73;
+  --color-primary: #8b6cff;
+  --color-primary-light: #b39aff;
+  --color-primary-dark: #5e3db8;
 
   /* Text */
-  --color-text-primary: #f6f2fa;
+  --color-text: #f6f2fa;
   --color-text-secondary: rgba(246, 242, 250, 0.7);
   --color-text-muted: rgba(246, 242, 250, 0.5);
   --color-text-inverse: #1e1236;

@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "./../../../hooks/useAuth";
 import Button from "../../common/Button/Button";
 import styles from "./Header.module.css";
+import ThemeSwitcher from "../../common/ThemeSwitcher/ThemeSwitcher";
 
 function Header() {
   const { user, logout } = useAuth();
@@ -73,6 +74,7 @@ function Header() {
 
         {/* Desktop User Section */}
         <div className={styles.user}>
+          <ThemeSwitcher />
           <span className={styles.userName}>{user?.name}</span>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             Logout
@@ -80,6 +82,7 @@ function Header() {
         </div>
 
         {/* Hamburger Button (Mobile Only) */}
+        {/* TODO: Switch to a common one */}
         <button
           className={`${styles.hamburger} ${
             isMenuOpen ? styles.hamburgerOpen : ""
@@ -136,6 +139,9 @@ function Header() {
             </div>
             <span className={styles.mobileUserName}>{user?.name}</span>
           </div>
+
+          <ThemeSwitcher />
+
           <Button
             variant="secondary"
             onClick={handleLogout}

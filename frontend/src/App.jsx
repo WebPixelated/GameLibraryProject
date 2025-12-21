@@ -8,6 +8,7 @@ import LibraryPage from "./pages/LibraryPage/LibraryPage";
 import SearchPage from "./pages/SearchPage/SearchPage";
 import { AuthProvider } from "./context/AuthProvider";
 import Loader from "./components/common/Loader/Loader";
+import { ThemeProvider } from "./context/ThemeProvider";
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -83,9 +84,11 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

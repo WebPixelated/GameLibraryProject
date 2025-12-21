@@ -135,6 +135,10 @@
   color: var(--color-text-secondary);
 }
 
+.edit-field input {
+  width: 100%;
+}
+
 .edit-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
