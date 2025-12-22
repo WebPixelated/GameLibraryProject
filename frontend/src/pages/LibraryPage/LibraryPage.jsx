@@ -43,6 +43,10 @@ function LibraryPage() {
   const [deleteGame, setDeleteGame] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Import Steam modal
+  const [importSession, setImportSession] = useState(null); // Acts as "isOpen" and data store
+  const [importing, setImporting] = useState(false); // Acts as loading state
+
   const fetchLibrary = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -124,11 +128,77 @@ function LibraryPage() {
     setSortOrder((prev) => (prev === "DESC" ? "ASC" : "DESC"));
   };
 
+  // Steam Import
+  const openImportModal = () => {
+    setImportSession({
+      step: "form", // "form", "progress", "results"
+      form: {
+        steamId: "",
+        limit: 50,
+        minPlaytime: 60,
+      },
+      results: null,
+    });
+    setError("");
+  };
+
+  const closeImportModal = () => {
+    setImportSession(null);
+  };
+
+  const handleImportFormChange = (field, value) => {
+    setImportSession((prev) => ({
+      ...prev,
+      form: { ...prev.form, [field]: value },
+    }));
+  };
+
+  const handleSteamImport = async () => {
+    if (!importSession) return;
+
+    setImporting(true);
+    setError("");
+    setImportSession((prev) => ({ ...prev, step: "progress" }));
+
+    try {
+      const res = await libraryAPI.importFromSteam(importSession.form);
+      setImportSession((prev) => ({
+        ...prev,
+        results: res.data,
+        step: "results",
+      }));
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to import Steam games");
+      setImportSession((prev) => ({ ...prev, step: "form" }));
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const completeImport = () => {
+    closeImportModal();
+    fetchLibrary();
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>My Library</h1>
-        <span className={styles.count}>{games.length} games</span>
+        <div className={styles.headerTitleGroup}>
+          <h1 className={styles.title}>My Library</h1>
+          <span className={styles.count}>{games.length} games</span>
+        </div>
+
+        <div className={styles.headerActions}>
+          <Button
+            variant="primary"
+            onClick={() => (window.location.href = "/search")}
+          >
+            + Add Game
+          </Button>
+          <Button variant="secondary" onClick={openImportModal}>
+            📥 Import
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -319,6 +389,116 @@ function LibraryPage() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Steam Import Modal */}
+      <Modal
+        isOpen={!!importSession}
+        onClose={closeImportModal}
+        title="Import from Steam"
+      >
+        {importSession && importSession.step === "form" && (
+          <div className={styles.importForm}>
+            <div className={styles.importField}>
+              <label>Steam ID or Vanity URL</label>
+              <input
+                type="text"
+                value={importSession.form.steamId}
+                onChange={(e) =>
+                  handleImportFormChange("steamId", e.target.value)
+                }
+                className={styles.input}
+                placeholder="steam_id"
+              />
+              <p className={styles.importHint}>
+                Enter your Steam ID or custom URL name.
+              </p>
+            </div>
+
+            <div className={styles.importRow}>
+              <div className={styles.importField}>
+                <label>Max Games</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="100"
+                  value={importSession.form.limit}
+                  onChange={(e) =>
+                    handleImportFormChange("limit", e.target.value)
+                  }
+                  className={styles.input}
+                />
+              </div>
+
+              <div className={styles.importField}>
+                <label>Min Playtime (min)</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={importSession.form.minPlaytime}
+                  onChange={(e) =>
+                    handleImportFormChange("minPlaytime", e.target.value)
+                  }
+                  className={styles.input}
+                />
+              </div>
+            </div>
+
+            <div className={styles.importActions}>
+              <Button variant="secondary" onClick={closeImportModal}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSteamImport}
+                loading={importing}
+                disabled={!importSession.form.steamId.trim()}
+              >
+                Start Import
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {importSession && importSession.step === "progress" && (
+          <div className={styles.importProgress}>
+            <Loader size="lg" />
+            <p>Importing your Steam games...</p>
+          </div>
+        )}
+
+        {importSession &&
+          importSession.step === "results" &&
+          importSession.results && (
+            <div className={styles.importResults}>
+              <div className={styles.importResultStats}>
+                <div className={styles.importStat}>
+                  <span className={styles.importStatValue}>
+                    {importSession.results.total_in_steam}
+                  </span>
+                  <span className={styles.importStatLabel}>Total</span>
+                </div>
+                <div className={styles.importStat}>
+                  <span className={styles.importStatValue}>
+                    {importSession.results.imported.length}
+                  </span>
+                  <span className={styles.importStatLabel}>Imported</span>
+                </div>
+                <div className={styles.importStat}>
+                  <span className={styles.importStatValue}>
+                    {importSession.results.failed.length}
+                  </span>
+                  <span className={styles.importStatLabel}>Failed</span>
+                </div>
+              </div>
+
+              <div className={styles.importActions}>
+                <Button variant="secondary" onClick={openImportModal}>
+                  Import More
+                </Button>
+                <Button onClick={completeImport}>Done</Button>
+              </div>
+            </div>
+          )}
       </Modal>
     </div>
   );

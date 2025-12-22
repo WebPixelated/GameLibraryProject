@@ -5,6 +5,7 @@ import { libraryAPI } from "../../api/index";
 import { Link } from "react-router-dom";
 import Loader from "./../../components/common/Loader/Loader";
 import StatusBadge from "./../../components/games/StatusBadge/StatusBadge";
+import { useMemo } from "react";
 
 function DashboardPage() {
   const { user } = useAuth();
@@ -26,6 +27,88 @@ function DashboardPage() {
 
     fetchDashboard();
   }, []);
+
+  const motivationalMessage = useMemo(() => {
+    if (!data) return null;
+
+    const { stats, two_weeks, currently_playing } = data;
+    const messages = [];
+
+    // 1. Firestarter
+    if (two_weeks.games_added >= 2) {
+      messages.push({
+        title: "🔥 Firestarter",
+        text: `You started collecting! Added ${two_weeks.games_added} new games recently.`,
+      });
+    }
+
+    // 2. Finisher
+    if (two_weeks.games_completed_week >= 1) {
+      messages.push({
+        title: "🎯 Finisher",
+        text: `Productive week! You completed ${two_weeks.games_completed_week} game(s).`,
+      });
+    }
+
+    // 3. Juggler
+    if (currently_playing.length >= 4) {
+      messages.push({
+        title: "🤹 Juggler",
+        text: `Multitasking master! You are playing ${currently_playing.length} games at once.`,
+      });
+    }
+
+    // 4. Veteran
+    if (stats.total_hours > 50) {
+      messages.push({
+        title: "🛡️ Veteran",
+        text: `Dedicated gamer! You've clocked over ${Math.floor(
+          stats.total_hours
+        )} hours total.`,
+      });
+    }
+
+    // 5. Connoisseur
+    if (stats.avg_rating >= 8.5) {
+      messages.push({
+        title: "⭐ Connoisseur",
+        text: `You have great taste! Your average rating is an impressive ${stats.avg_rating}/10.`,
+      });
+    }
+
+    // 6. Completionist
+    // const completionRate =
+    //   stats.total_games > 0 ? stats.completed / stats.total_games : 0;
+    // if (completionRate > 0.5 && stats.total_games > 5) {
+    //   messages.push({
+    //     title: "🏆 True Completionist",
+    //     text: `Halfway there! You've completed over 50% of your entire library.`,
+    //   });
+    // }
+
+    // 7. Librarian
+    if (
+      Number(stats.owned) + Number(stats.wishlist) > 10 &&
+      stats.playing === 0
+    ) {
+      messages.push({
+        title: "📚 Librarian",
+        text: "So many games waiting for you! Time to pick one and start playing?",
+      });
+    }
+
+    // No achievements yet
+    if (messages.length === 0) {
+      return {
+        title: "👋 Gamer",
+        text: "Welcome back! Ready to log some play time?",
+      };
+    }
+
+    // Return random message
+    const randomIndex = Math.floor(Math.random() * messages.length);
+    return messages[randomIndex];
+  }, [data]);
 
   if (loading) {
     return <Loader fullScreen />;
@@ -53,6 +136,21 @@ function DashboardPage() {
         <h1 className={styles.title}>Welcome back, {user?.name}!</h1>
         <p className={styles.subtitle}>Here's your gaming overview</p>
       </div>
+
+      {/* Insight Badge */}
+      {motivationalMessage && (
+        <div className={styles.insightBanner}>
+          <div className={styles.insightIcon}>
+            {motivationalMessage.title.split(" ")[0]}
+          </div>
+          <div className={styles.insightContent}>
+            <h3 className={styles.insightTitle}>
+              {motivationalMessage.title.split(" ").slice(1).join(" ")}
+            </h3>
+            <p className={styles.insightText}>{motivationalMessage.text}</p>
+          </div>
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className={styles.statsGrid}>
