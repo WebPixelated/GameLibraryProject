@@ -53,6 +53,9 @@ export const libraryAPI = {
   // Stats
   getStats: () => api.get("/library/stats"),
   getDashboard: () => api.get("/library/dashboard"),
+
+  // Import
+  importFromSteam: (data) => api.post("/library/import/steam", data),
 };
 
 export default api;
