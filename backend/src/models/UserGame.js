@@ -50,7 +50,7 @@ class UserGame {
     if (sortColumn === "title") {
       query += ` ORDER BY g.title ${sortOrder}`;
     } else {
-      query += ` ORDER BY ug.${sortColumn} ${sortOrder}`;
+      query += ` ORDER BY ug.${sortColumn} ${sortOrder} NULLS LAST`;
     }
 
     const result = await db.query(query, params);
