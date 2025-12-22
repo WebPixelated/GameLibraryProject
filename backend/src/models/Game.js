@@ -12,16 +12,22 @@ class Game {
   // Find by Steam App ID
   static async findBySteamAppId(steamAppId) {
     const result = await db.query(
-      "SELECT * FROM games WHERE steam_app_id = $1",
+      "SELECT * FROM games WHERE steam_app_id = $1 LIMIT 1",
       [steamAppId]
     );
     return result.rows[0] || null;
   }
 
-  // Find by title
+  // Find by title (fuzzy match using trigram)
   static async findByTitle(title) {
     const result = await db.query(
-      "SELECT * FROM games WHERE LOWER(title) = LOWER($1)",
+      `
+      SELECT *, similarity(title, $1) AS sim
+      FROM games
+      WHERE similarity(title, $1) > 0.3
+      ORDER BY sim DESC
+      LIMIT 1
+      `,
       [title]
     );
     return result.rows[0] || null;
@@ -63,6 +69,55 @@ class Game {
       ]
     );
 
+    return result.rows[0];
+  }
+
+  // Upsert from Steam
+  static async upsertFromSteam({ steam_app_id, title, released, image_url }) {
+    console.log(`Upserting from Steam: ${title} (app_id: ${steam_app_id})`);
+
+    const result = await db.query(
+      "SELECT upsert_game_from_steam($1, $2, $3, $4) AS game_id",
+      [steam_app_id, title, released || null, image_url || null]
+    );
+
+    const gameId = result.rows[0]?.game_id;
+
+    if (!gameId) {
+      console.error(
+        `No game_id returned for Steam app: ${steam_app_id}, title: ${title}`
+      );
+      throw new Error(`Failed to upsert game from Steam: ${title}`);
+    }
+
+    // Return full game object
+    const game = await db.query("SELECT * FROM games WHERE id = $1", [gameId]);
+    return game.rows[0];
+  }
+
+  static async enrichWithRawg(gameId, rawgData) {
+    const result = await db.query(
+      `UPDATE games SET
+         rawg_id = COALESCE($2, rawg_id),
+         image_url = COALESCE($3, image_url),
+         genres = COALESCE($4, genres),
+         tags = COALESCE($5, tags),
+         metacritic = COALESCE($6, metacritic),
+         source = CASE 
+           WHEN steam_app_id IS NOT NULL THEN 'both'::game_source
+           ELSE 'rawg'
+         END
+       WHERE id = $1
+       RETURNING *`,
+      [
+        gameId,
+        rawgData.rawg_id,
+        rawgData.image_url,
+        rawgData.genres,
+        rawgData.tags,
+        rawgData.metacritic,
+      ]
+    );
     return result.rows[0];
   }
 

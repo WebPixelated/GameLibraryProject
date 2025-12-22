@@ -1,6 +1,9 @@
 const Game = require("../models/Game");
 const UserGame = require("../models/UserGame");
+const User = require("../models/User");
 const RawgService = require("../services/RawgService");
+const ImportService = require("../services/ImportService");
+const SteamService = require("../services/SteamService");
 
 // Get user's library
 exports.getLibrary = async (req, res) => {
@@ -115,7 +118,7 @@ exports.getGame = async (req, res) => {
   try {
     const { id } = req.params;
 
-    if (!id || typeof id !== Number) {
+    if (!id || isNaN(Number(id))) {
       return res.status(400).json({
         error: "Invalid ID parameter",
       });
@@ -260,6 +263,64 @@ exports.getDashboard = async (req, res) => {
     console.error("Get dashboard error:", error);
     res.status(500).json({
       error: "Failed to get dashboard",
+    });
+  }
+};
+
+// Import steam games
+exports.importFromSteam = async (req, res) => {
+  try {
+    const { steamId, limit = 50, minPlaytime = 0 } = req.body;
+
+    // Get user
+    const user = await User.findById(req.userId);
+
+    // Determine steam ID: from request or from profile
+    let finalSteamId = steamId?.trim() || user.steam_id;
+
+    if (!finalSteamId) {
+      return res.status(400).json({
+        error: "Steam ID required. Pass steamId in body or link account first.",
+      });
+    }
+
+    // Normalize (handle vanity URLs)
+    if (!SteamService.isValidSteamId(finalSteamId)) {
+      finalSteamId = await SteamService.resolveVanityUrl(finalSteamId);
+    }
+
+    // Validate profile is public
+    const profile = await SteamService.getPlayerSummary(finalSteamId);
+    if (!profile.is_public) {
+      return res.status(400).json({
+        error: 'Steam profile is private. Set "Game details" to Public',
+      });
+    }
+
+    // Save steam_id to profile if not already saved
+    if (!user.steam_id) {
+      await User.updateSteamId(req.userId, { steam_id: finalSteamId });
+    }
+
+    // Import
+    const results = await ImportService.importFromSteam(
+      req.userId,
+      finalSteamId,
+      {
+        limit: Math.min(Number(limit) || 50, 100),
+        minPlaytime: Number(minPlaytime) || 0,
+      }
+    );
+
+    res.json({
+      message: "Import completed",
+      steam_profile: profile.persona_name,
+      ...results,
+    });
+  } catch (error) {
+    console.error("Import games from steam error:", error);
+    res.status(500).json({
+      error: "Failed to import steam games",
     });
   }
 };
