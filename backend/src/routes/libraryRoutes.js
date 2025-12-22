@@ -11,6 +11,9 @@ libraryRouter.get("/search", libraryController.searchGames);
 libraryRouter.get("/stats", libraryController.getStats);
 libraryRouter.get("/dashboard", libraryController.getDashboard);
 
+// Steam import
+libraryRouter.post("/import/steam", libraryController.importFromSteam);
+
 // CRUD
 libraryRouter.get("/", libraryController.getLibrary);
 libraryRouter.post("/", libraryController.addGame);

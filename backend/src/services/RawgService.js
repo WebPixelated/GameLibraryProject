@@ -4,7 +4,7 @@ const db = require("../config/db");
 
 const RAWG_BASE_URL = process.env.RAWG_BASE_URL;
 const RAWG_API_KEY = process.env.RAWG_API_KEY;
-const CACHE_TTL = process.env.RAWG_CACHE_TTL || 60 * 60 * 1000; // 1 hour in ms
+const CACHE_TTL = Number(process.env.RAWG_CACHE_TTL) || 60 * 60 * 1000; // 1 hour in ms
 
 console.log(RAWG_BASE_URL);
 
