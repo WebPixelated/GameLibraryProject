@@ -43,7 +43,7 @@ exports.searchGames = async (req, res) => {
       results.local = await Game.search(q.trim());
     }
 
-    console.log(results);
+    // console.log(results);
 
     // Search in RAWG
     if (source === "all" || source === "rawg") {
@@ -51,7 +51,7 @@ exports.searchGames = async (req, res) => {
       results.rawg = rawgResults.results;
     }
 
-    console.log(results);
+    // console.log(results);
 
     res.json(results);
   } catch (error) {
@@ -151,10 +151,18 @@ exports.updateGame = async (req, res) => {
     }
 
     // Validation
-    if (rating !== undefined && (rating < 1 || rating > 10)) {
-      return res.status(400).json({
-        error: "Rating must be between 1 to 10",
-      });
+    if (rating !== null && rating !== undefined) {
+      const numericRating = Number(rating);
+
+      if (
+        !Number.isInteger(numericRating) ||
+        numericRating < 1 ||
+        numericRating > 10
+      ) {
+        return res.status(400).json({
+          error: "Rating must be an integer between 1 and 10 or null",
+        });
+      }
     }
 
     if (hours_played !== undefined && hours_played < 0) {
