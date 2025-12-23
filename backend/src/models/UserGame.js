@@ -82,13 +82,27 @@ class UserGame {
 
   // Add game to library
   static async addGameToLibrary(userId, gameId, data = {}) {
-    const { status = "owned", rating, notes, hours_played = 0 } = data;
+    const {
+      status = "owned",
+      rating,
+      notes,
+      hours_played = 0,
+      completed_at,
+    } = data;
+
+    let finalCompletedAt = completed_at;
+
+    if (status === "completed" && !completed_at) {
+      finalCompletedAt = new Date();
+    }
+
+    // console.log(finalCompletedAt);
 
     const result = await db.query(
-      `INSERT INTO user_games (user_id, game_id, status, rating, notes, hours_played)
-       VALUES ($1, $2, $3, $4, $5, $6)
+      `INSERT INTO user_games (user_id, game_id, status, rating, notes, hours_played, completed_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [userId, gameId, status, rating, notes, hours_played]
+      [userId, gameId, status, rating, notes, hours_played, finalCompletedAt]
     );
 
     return result.rows[0];
@@ -108,19 +122,20 @@ class UserGame {
         completed_at = current.completed_at;
       }
     }
-
     const result = await db.query(
       `UPDATE user_games 
-       SET 
-         status = COALESCE($3, status),
-         rating = COALESCE($4, rating),
-         notes = COALESCE($5, notes),
-         hours_played = COALESCE($6, hours_played),
-         completed_at = $7
-       WHERE game_id = $1 AND user_id = $2
-       RETURNING *`,
+     SET 
+       status = COALESCE($3, status),
+       rating = COALESCE($4, rating),
+       notes = COALESCE($5, notes),
+       hours_played = COALESCE($6, hours_played),
+       completed_at = $7
+     WHERE game_id = $1 AND user_id = $2
+     RETURNING *`,
       [userGameId, userId, status, rating, notes, hours_played, completed_at]
     );
+
+    // console.log("[updateGameInLibrary] DB result:", result.rows[0]);
 
     return result.rows[0] || null;
   }

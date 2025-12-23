@@ -6,6 +6,7 @@ import GameCard from "./../../components/games/GameCard/GameCard";
 import Loader from "./../../components/common/Loader/Loader";
 import Modal from "./../../components/games/Modal/Modal";
 import StatusSelect from "./../../components/games/StatusSelect/StatusSelect";
+import { useNavigate } from "react-router-dom";
 
 const FILTER_OPTIONS = [
   { value: "", label: "All Games" },
@@ -25,6 +26,7 @@ const SORT_OPTIONS = [
 ];
 
 function LibraryPage() {
+  const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -71,6 +73,7 @@ function LibraryPage() {
   }, [fetchLibrary]);
 
   const openEditModal = (game) => {
+    // console.log(game);
     setEditGame(game);
     setEditForm({
       status: game.status,
@@ -89,18 +92,24 @@ function LibraryPage() {
 
     setSaving(true);
     try {
-      const res = await libraryAPI.updateGame(editGame.id, {
+      const payload = {
         status: editForm.status,
-        rating: editForm.rating ? Number(editForm.rating) : null,
         hours_played: Number(editForm.hours_played),
         notes: editForm.notes || null,
-      });
+      };
 
-      // Update locally
-      setGames((prev) =>
-        prev.map((g) => (g.id === editGame.id ? { ...g, ...res.data } : g))
-      );
+      // Rating check
+      if (editForm.rating === "" || editForm.rating === null) {
+        payload.rating = null;
+      } else {
+        const numRating = Number(editForm.rating);
+        if (numRating >= 1 && numRating <= 10) {
+          payload.rating = numRating;
+        }
+      }
 
+      await libraryAPI.updateGame(editGame.game_id, payload);
+      await fetchLibrary();
       setEditGame(null);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to update game");
@@ -114,8 +123,8 @@ function LibraryPage() {
 
     setDeleting(true);
     try {
-      await libraryAPI.deleteGame(deleteGame.id);
-      setGames((prev) => prev.filter((g) => g.id !== deleteGame.id));
+      await libraryAPI.deleteGame(deleteGame.game_id);
+      setGames((prev) => prev.filter((g) => g.game_id !== deleteGame.game_id));
       setDeleteGame(null);
     } catch (err) {
       setError(err.response?.data?.error || "Failed to delete game");
@@ -189,10 +198,7 @@ function LibraryPage() {
         </div>
 
         <div className={styles.headerActions}>
-          <Button
-            variant="primary"
-            onClick={() => (window.location.href = "/search")}
-          >
+          <Button variant="primary" onClick={() => navigate("/search")}>
             + Add Game
           </Button>
           <Button variant="secondary" onClick={openImportModal}>
@@ -248,10 +254,10 @@ function LibraryPage() {
         <div className={styles.grid}>
           {games.map((game) => (
             <GameCard
-              key={game.id}
+              key={game.game_id}
               game={game}
               showStatus
-              onClick={() => openEditModal(game)}
+              // onClick={() => openEditModal(game)}
               actions={
                 <div className={styles.cardActions}>
                   <Button
@@ -490,6 +496,98 @@ function LibraryPage() {
                   <span className={styles.importStatLabel}>Failed</span>
                 </div>
               </div>
+
+              {/* Imported games */}
+              {importSession.results.imported.length > 0 && (
+                <div className={styles.importSection}>
+                  <h4 className={styles.importSectionTitle}>
+                    ✅ Imported ({importSession.results.imported.length})
+                  </h4>
+                  <div className={styles.importList}>
+                    {importSession.results.imported.map((game, idx) => (
+                      <div key={idx} className={styles.importItem}>
+                        <span className={styles.importItemName}>
+                          {game.name}
+                        </span>
+                        <span className={styles.importItemMeta}>
+                          {game.hours_played}h · {game.status}
+                          {game.has_rawg_data && " · 🎮"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Updated games */}
+              {importSession.results.updated.length > 0 && (
+                <div className={styles.importSection}>
+                  <h4 className={styles.importSectionTitle}>
+                    🔄 Updated ({importSession.results.updated.length})
+                  </h4>
+                  <div className={styles.importList}>
+                    {importSession.results.updated.map((game, idx) => (
+                      <div key={idx} className={styles.importItem}>
+                        <span className={styles.importItemName}>
+                          {game.name}
+                        </span>
+                        <span className={styles.importItemMeta}>
+                          {game.hours_played}h
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Skipped games */}
+              {importSession.results.skipped.length > 0 && (
+                <div className={styles.importSection}>
+                  <h4 className={styles.importSectionTitle}>
+                    ⏭️ Skipped ({importSession.results.skipped.length})
+                  </h4>
+                  <div className={styles.importList}>
+                    {importSession.results.skipped
+                      .slice(0, 5)
+                      .map((game, idx) => (
+                        <div key={idx} className={styles.importItem}>
+                          <span className={styles.importItemName}>
+                            {game.name}
+                          </span>
+                          <span className={styles.importItemReason}>
+                            {game.reason}
+                          </span>
+                        </div>
+                      ))}
+                    {importSession.results.skipped.length > 5 && (
+                      <div className={styles.importItemMore}>
+                        +{importSession.results.skipped.length - 5} more...
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Import fails */}
+              {importSession.results.failed.length > 0 && (
+                <div className={styles.importSection}>
+                  <h4 className={styles.importSectionTitle}>
+                    ❌ Failed ({importSession.results.failed.length})
+                  </h4>
+                  <div className={styles.importList}>
+                    {importSession.results.failed.map((game, idx) => (
+                      <div key={idx} className={styles.importItem}>
+                        <span className={styles.importItemName}>
+                          {game.name}
+                        </span>
+                        <span className={styles.importItemError}>
+                          {game.error}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className={styles.importActions}>
                 <Button variant="secondary" onClick={openImportModal}>

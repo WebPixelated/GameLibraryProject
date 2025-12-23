@@ -95,7 +95,8 @@ class ImportService {
         }
 
         // Add to user's library
-        const status = steamGame.playtime_hours > 0 ? "playing" : "owned";
+        // const status = steamGame.playtime_hours > 0 ? "playing" : "owned";
+        const status = "owned";
 
         await UserGame.addGameToLibrary(userId, game.id, {
           status,

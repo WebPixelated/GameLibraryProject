@@ -308,6 +308,76 @@
   text-transform: uppercase;
 }
 
+/* Imported sections */
+
+.import-section {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.import-section-title {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.import-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.import-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm);
+  background-color: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+}
+
+.import-item-name {
+  font-weight: 500;
+  color: var(--color-text);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import-item-meta {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  margin-left: var(--spacing-md);
+  white-space: nowrap;
+}
+
+.import-item-reason,
+.import-item-error {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-left: var(--spacing-md);
+  white-space: nowrap;
+}
+
+.import-item-error {
+  color: var(--color-error);
+}
+
+.import-item-more {
+  padding: var(--spacing-sm);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
 /* Progress */
 .import-progress {
   text-align: center;

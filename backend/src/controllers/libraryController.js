@@ -147,6 +147,11 @@ exports.updateGame = async (req, res) => {
     const { id } = req.params;
     const { status, rating, notes, hours_played } = req.body;
 
+    // console.log("=== UPDATE GAME ===");
+    // console.log("req.params.id:", id);
+    // console.log("req.userId:", req.userId);
+    // console.log("body:", { status, rating, notes, hours_played });
+
     if (!status && !rating && !notes && !hours_played) {
       return res.status(400).json({
         error: "Rating, status, notes or hours_played should be used",
@@ -194,6 +199,8 @@ exports.updateGame = async (req, res) => {
       hours_played,
     });
 
+    // console.log("updated result:", updated);
+
     if (!updated) {
       return res.status(404).json({
         error: "Game not found in library",
@@ -210,11 +217,18 @@ exports.updateGame = async (req, res) => {
 };
 
 // Delete game from library
+
 exports.deleteGame = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // console.log("=== DELETE GAME ===");
+    // console.log("req.params.id:", id);
+    // console.log("req.userId:", req.userId);
+
     const deleted = await UserGame.deleteGameInLibrary(req.userId, id);
+
+    // console.log("deleted result:", deleted);
 
     if (!deleted) {
       return res.status(404).json({
